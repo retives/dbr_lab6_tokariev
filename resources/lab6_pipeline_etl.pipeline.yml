@@ -1,0 +1,37 @@
+# The main pipeline for lab6_pipeline
+
+resources:
+  pipelines:
+    lab6_pipeline_etl:
+      name: lab6_pipeline_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: false 
+      root_path: "../src/lab6_pipeline_etl"
+
+      libraries:
+        - glob:
+            include: ../src/lab6_pipeline_etl/transformations/**
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}
+          - kagglehub
+  clusters:
+    lab6_pipeline_cluster:
+      spark_version: "15.4.x-scala2.12"
+      node_type_id: "Standard_F4"
+      data_security_mode: SINGLE_USER
+      num_workers: 0
+      autotermination_minutes: 30
+      spark_conf:
+        spark.databricks.cluster.profile: singleNode
+        spark.master: local[*]
+        spark.databricks.delta.preview.enabled: "true"
+      custom_tags:
+        ResourceClass: SingleNode
+      spark_env_vars:
+        PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+  
