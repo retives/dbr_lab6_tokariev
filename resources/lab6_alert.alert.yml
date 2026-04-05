@@ -1,0 +1,17 @@
+resources:
+  alerts:
+    lab6_alert:
+      display_name: "Lab6 Alert"
+      query_text: "SELECT count(*) as cnt FROM ${var.catalog}.${var.schema}.your_table WHERE ..."
+      warehouse_id: a1f04664c7fcffa4
+      schedule:
+        quartz_cron_schedule: "0 0 0 * * ?"
+        timezone_id: "UTC"
+        pause_status: PAUSED
+      evaluation:
+        comparison_operator: LESS_THAN
+        threshold:
+          value:
+            double_value: "10000"
+        source:
+          name: cnt

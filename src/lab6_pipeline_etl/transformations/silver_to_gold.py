@@ -1,7 +1,6 @@
-import dlt
 import pyspark.sql.functions as F
 from pyspark.sql.types import DoubleType, IntegerType, TimestampType
-
+from pyspark import pipelines as dp
 
 CATALOG   = "dbr_dev"
 SILVER_DB = "tokariev_silver"
@@ -9,14 +8,19 @@ GOLD_DB   = "tokariev_gold"
 
 # DIMENSION TABLES
 
-@dlt.table(
+@dp.table(
     name=f"{GOLD_DB}.dim_customers",
-    comment="Customer dimension with geographic information",
-    table_properties={"quality": "gold"},
+    schema="""
+        customer_id STRING,
+        customer_unique_id STRING MASK dbr_dev.tokariev_gold.pii_mask,
+        customer_zip_code_prefix STRING,
+        customer_city STRING,
+        customer_state STRING
+    """
 )
 def dim_customers():
     return (
-        dlt.read(f"{CATALOG}.{SILVER_DB}.silver_customers")
+        dp.read(f"{CATALOG}.{SILVER_DB}.silver_customers")
         .select(
             "customer_id",
             "customer_unique_id",
@@ -28,16 +32,14 @@ def dim_customers():
     )
 
 
-@dlt.table(
+@dp.table(
     name=f"{GOLD_DB}.dim_products",
-    comment="Product dimension with translated categories and specifications",
-    table_properties={"quality": "gold"},
 )
 def dim_products():
     return (
-        dlt.read(f"{CATALOG}.{SILVER_DB}.silver_products")
+        dp.read(f"{CATALOG}.{SILVER_DB}.silver_products")
         .join(
-            dlt.read(f"{CATALOG}.{SILVER_DB}.silver_product_category_translation"),
+            dp.read(f"{CATALOG}.{SILVER_DB}.silver_product_category_translation"),
             "product_category_name",
             how="left"
         )
@@ -57,14 +59,13 @@ def dim_products():
     )
 
 
-@dlt.table(
+@dp.table(
     name=f"{GOLD_DB}.dim_sellers",
-    comment="Seller dimension with geographic information",
-    table_properties={"quality": "gold"},
+    row_filter="ROW FILTER seller_filter ON (seller_id)"
 )
 def dim_sellers():
     return (
-        dlt.read(f"{CATALOG}.{SILVER_DB}.silver_sellers")
+        dp.read(f"{CATALOG}.{SILVER_DB}.silver_sellers")
         .select(
             "seller_id",
             "seller_zip_code_prefix",
@@ -76,16 +77,14 @@ def dim_sellers():
 
 # FACT TABLES
 
-@dlt.table(
+@dp.table(
     name=f"{GOLD_DB}.fact_order_items",
-    comment="Fact table: Order items with order details and metrics",
-    table_properties={"quality": "gold"},
 )
 def fact_order_items():
     return (
-        dlt.read(f"{CATALOG}.{SILVER_DB}.silver_order_items")
+        dp.read(f"{CATALOG}.{SILVER_DB}.silver_order_items")
         .join(
-            dlt.read(f"{CATALOG}.{SILVER_DB}.silver_orders"),
+            dp.read(f"{CATALOG}.{SILVER_DB}.silver_orders"),
             "order_id",
             how="left"
         )
@@ -110,16 +109,14 @@ def fact_order_items():
 
 # ANALYTICS / SUMMARY TABLES
 
-@dlt.table(
+@dp.table(
     name=f"{GOLD_DB}.gold_bcomm_olist_orders_per_state",
-    comment="Analytics: Delivery success rate by customer state",
-    table_properties={"quality": "gold"},
 )
 def gold_orders_per_state():
     return (
-        dlt.read(f"{CATALOG}.{GOLD_DB}.fact_order_items")
+        dp.read(f"{CATALOG}.{GOLD_DB}.fact_order_items")
         .join(
-            dlt.read(f"{CATALOG}.{GOLD_DB}.dim_customers"),
+            dp.read(f"{CATALOG}.{GOLD_DB}.dim_customers"),
             "customer_id",
             how="left"
         )
@@ -130,4 +127,15 @@ def gold_orders_per_state():
                 2
             ).alias("delivered_percentage")
         )
+        .withColumn("iso_state", F.concat(F.lit("BR-"), F.col("customer_state")))
+    )
+
+@dp.table(
+    name="tokariev_gold.gold_bcomm_olist_product_categories_count"
+)
+def gold_product_categories_count():
+    return (
+        dp.read(f"{CATALOG}.{GOLD_DB}.dim_products")
+        .groupBy("product_category_name_english")
+        .agg(F.count("product_id").alias("product_count"))
     )

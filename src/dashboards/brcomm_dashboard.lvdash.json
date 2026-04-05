@@ -1,0 +1,307 @@
+{
+  "datasets": [
+    {
+      "name": "509d54d2",
+      "displayName": "gold_bcomm_olist_orders_per_state",
+      "queryLines": [
+        "SELECT * FROM dbr_dev.tokariev_gold.gold_bcomm_olist_orders_per_state"
+      ]
+    },
+    {
+      "name": "f9d2b0e1",
+      "displayName": "Product Categories Summary Dataset",
+      "queryLines": [
+        "select * from dbr_dev.tokariev_gold.gold_bcomm_olist_product_categories_count order by count"
+      ],
+      "catalog": "dbr_dev",
+      "schema": "tokariev_gold"
+    }
+  ],
+  "pages": [
+    {
+      "name": "c586d0d1",
+      "displayName": "Delivery rate per state",
+      "layout": [
+        {
+          "widget": {
+            "name": "6dae5456",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "509d54d2",
+                  "fields": [
+                    {
+                      "name": "sum(delivered_percentage)",
+                      "expression": "SUM(`delivered_percentage`)"
+                    },
+                    {
+                      "name": "delivered_percentage",
+                      "expression": "`delivered_percentage`"
+                    },
+                    {
+                      "name": "iso_state",
+                      "expression": "`iso_state`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "choropleth-map",
+              "encodings": {
+                "color": {
+                  "fieldName": "sum(delivered_percentage)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "extra": [
+                  {
+                    "fieldName": "delivered_percentage"
+                  }
+                ],
+                "region": {
+                  "regionType": "mapbox-v4-admin",
+                  "admin0": {
+                    "type": "value",
+                    "value": "Brasil",
+                    "geographicRole": "admin0-name"
+                  },
+                  "admin1": {
+                    "fieldName": "iso_state",
+                    "type": "field",
+                    "geographicRole": "admin1-iso-3166-2"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 7,
+            "height": 11
+          }
+        },
+        {
+          "widget": {
+            "name": "0681e4d3",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "509d54d2",
+                  "fields": [
+                    {
+                      "name": "sum(delivered_percentage)",
+                      "expression": "SUM(`delivered_percentage`)"
+                    },
+                    {
+                      "name": "customer_state",
+                      "expression": "`customer_state`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(delivered_percentage)",
+                  "scale": {
+                    "type": "quantitative",
+                    "domain": {
+                      "min": 0.8,
+                      "max": 1
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "customer_state",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 2,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "0ffadf6b",
+            "queries": [
+              {
+                "name": "dashboards/01f12516fb8013f59f2610fcd47a1503/datasets/01f12517129d12429d519fd4e0c3a84d_iso_state",
+                "query": {
+                  "datasetName": "509d54d2",
+                  "fields": [
+                    {
+                      "name": "iso_state",
+                      "expression": "`iso_state`"
+                    },
+                    {
+                      "name": "iso_state_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "iso_state",
+                    "queryName": "dashboards/01f12516fb8013f59f2610fcd47a1503/datasets/01f12517129d12429d519fd4e0c3a84d_iso_state"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 0,
+            "width": 5,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "71baf393",
+      "displayName": "Category counts",
+      "layout": [
+        {
+          "widget": {
+            "name": "5efa2ae7",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f9d2b0e1",
+                  "fields": [
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    },
+                    {
+                      "name": "product_category_name_english",
+                      "expression": "`product_category_name_english`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "product_category_name_english",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 12,
+            "height": 20
+          }
+        },
+        {
+          "widget": {
+            "name": "275e89df",
+            "queries": [
+              {
+                "name": "dashboards/01f12516fb8013f59f2610fcd47a1503/datasets/01f126ca62cf1f7fb0bcdb9a8465db86_count",
+                "query": {
+                  "datasetName": "f9d2b0e1",
+                  "fields": [
+                    {
+                      "name": "min(count)",
+                      "expression": "MIN(`count`)"
+                    },
+                    {
+                      "name": "max(count)",
+                      "expression": "MAX(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "range-slider",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "count",
+                    "queryName": "dashboards/01f12516fb8013f59f2610fcd47a1503/datasets/01f126ca62cf1f7fb0bcdb9a8465db86_count"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "78b4b5dc",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

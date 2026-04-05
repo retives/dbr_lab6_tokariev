@@ -1,0 +1,8 @@
+resources:
+  dashboards:
+    lab6_dashboard:
+      display_name: "Lab6 Dashboard"
+      file_path: ../src/dashboards/brcomm_dashboard.lvdash.json
+      warehouse_id: a1f04664c7fcffa4
+      dataset_catalog: ${var.catalog}
+      dataset_schema: ${var.schema}

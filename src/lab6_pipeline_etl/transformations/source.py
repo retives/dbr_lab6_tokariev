@@ -4,7 +4,8 @@ import pyspark.sql.functions as F
 from pyspark.sql.types import DoubleType, IntegerType, TimestampType
 import shutil
 import os
- 
+from pyspark import pipelines as dp
+
 
  
 CATALOG   = "dbr_dev"
@@ -23,10 +24,8 @@ def kaggle_path(filename: str) -> str:
     dataset_dir = kagglehub.dataset_download("olistbr/brazilian-ecommerce")
     return f"{dataset_dir}/{filename}"
 
-@dlt.table(
+@dp.table(
     name="bcomm_olist_orders",
-    comment="Raw orders data ingested from Kaggle olist dataset",
-    table_properties={"quality": "bronze"},
 )
 def bronze_orders():
     return spark.read.option("header", True).csv(
@@ -34,10 +33,8 @@ def bronze_orders():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_order_items",
-    comment="Raw order items data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_order_items():
     return spark.read.option("header", True).csv(
@@ -45,10 +42,8 @@ def bronze_order_items():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_customers",
-    comment="Raw customers data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_customers():
     return spark.read.option("header", True).csv(
@@ -56,10 +51,8 @@ def bronze_customers():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_products",
-    comment="Raw products data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_products():
     return spark.read.option("header", True).csv(
@@ -67,10 +60,8 @@ def bronze_products():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_sellers",
-    comment="Raw sellers data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_sellers():
     return spark.read.option("header", True).csv(
@@ -78,10 +69,8 @@ def bronze_sellers():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_order_reviews",
-    comment="Raw order reviews data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_order_reviews():
     return spark.read.option("header", True).csv(
@@ -89,10 +78,8 @@ def bronze_order_reviews():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_order_payments",
-    comment="Raw order payments data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_order_payments():
     return spark.read.option("header", True).csv(
@@ -100,14 +87,19 @@ def bronze_order_payments():
     )
  
  
-@dlt.table(
+@dp.table(
     name="bcomm_olist_geolocation",
-    comment="Raw geolocation data",
-    table_properties={"quality": "bronze"},
 )
 def bronze_geolocation():
     return spark.read.option("header", True).csv(
         kaggle_path("olist_geolocation_dataset.csv")
     )
- 
+
+@dp.table(
+     name="bcomm_product_category_name_translation"
+)
+def bronze_product_category_name_translation():
+     return spark.read.option("header", True).csv(
+         kaggle_path("product_category_name_translation.csv")
+     )
  
