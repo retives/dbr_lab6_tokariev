@@ -1,0 +1,41 @@
+name: Dev Deployment
+on: 
+    workflow_dispatch:
+    push:
+        branches:
+            - 'dev/**'
+    pull_request:
+        types: 
+        - opened
+        branches:
+        - 'dev/**'
+        - 'main'
+    
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    deploy-dev:
+        runs-on: ubuntu-latest
+        environment: DEV 
+        env:
+          DATABRICKS_AUTH_TYPE: github-oicd
+          DATABRICKS_HOST: https://adb-7405605185991044.4.azuredatabricks.net
+          DATABRICKS_CLIENT_ID: 
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Install Databricks CLI
+          uses: datbricks/setup-cli@main
+
+        - name: Verify user
+          run: databricks current-user me
+
+        - name: Validate dev bundle
+          run: databricks bundle validate --target dev 
+
+        - name: Deploy bundle
+          run: databricks pipelines deploy
+
+    
