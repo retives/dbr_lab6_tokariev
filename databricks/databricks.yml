@@ -13,6 +13,8 @@ variables:
     description: The catalog to use
   schema:
     description: The schema to use
+  warehouse_id:
+    description: SQL warehouse ID
 
 targets:
   dev:
@@ -24,14 +26,16 @@ targets:
     variables:
       catalog: dbr_dev
       schema: tokariev_bronze
-  prod:
-    mode: production
+      warehouse_id: a1f04664c7fcffa4
+  test:
+    mode: testing
     workspace:
       host: https://adb-7405605185991044.4.azuredatabricks.net
       root_path: /Workspace/Users/tr3e1t0ry@softserve.academy/lab6/${bundle.name}/${bundle.target}
     variables:
       catalog: dbr_dev
-      schema: prod
+      schema: tokariev_bronze
+      warehouse_id: a1f04664c7fcffa4
     permissions:
       - user_name: tr3e1t0ry@softserve.academy
         level: CAN_MANAGE

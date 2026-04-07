@@ -2,8 +2,8 @@ resources:
   alerts:
     lab6_alert:
       display_name: "Lab6 Alert"
-      query_text: "SELECT count(*) as cnt FROM ${var.catalog}.${var.schema}.your_table WHERE ..."
-      warehouse_id: a1f04664c7fcffa4
+      query_text: "SELECT count(*) as cnt FROM dbr_dev.tokariev_bronze.bcomm_olist_orders WHERE ..."
+      warehouse_id: ${var.warehouse_id}
       schedule:
         quartz_cron_schedule: "0 0 0 * * ?"
         timezone_id: "UTC"
